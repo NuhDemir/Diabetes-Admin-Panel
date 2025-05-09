@@ -16,7 +16,7 @@ const app = express();
 app.use(cors()); // CORS ayarları
 app.use(express.json()); //Gelen json verilerini parse etmek için
 
-app.get("/", (res, req) => {
+app.get("/", (req, res) => {
   res.send("Diabetes API çalışıyor...");
 });
 
