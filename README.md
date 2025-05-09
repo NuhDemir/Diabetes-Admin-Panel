@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/NuhDemir/Diabetes-Admin-Panel/refs/heads/main/img/image.png"/>
+
 # Uluslararası FuAy Hastanesi - Diyabet Analiz Paneli
 
 Bu proje, Uluslararası FuAy Hastanesi iç hastalıkları servisinde görev yapan doktorların, diyabet hastalığına ilişkin risk faktörlerini daha iyi analiz edebilmeleri ve erken müdahale şansını artırabilmeleri amacıyla geliştirilmiş web tabanlı bir gösterge panelidir.
