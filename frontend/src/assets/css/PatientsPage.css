@@ -1,0 +1,310 @@
+/* frontend/src/assets/css/PatientsPage.css */
+
+/* :root içinde tanımladığımız Neubrutalizm değişkenlerini burada da kullanabiliriz
+   Eğer bu değişkenler global olarak (örn: main.css veya index.css) tanımlanmadıysa,
+   burada tekrar tanımlamak veya import etmek gerekebilir.
+   Şimdilik var olduklarını varsayıyorum.
+*/
+/*
+:root {
+  --nb-border: 3px solid black;
+  --nb-shadow: 6px 6px 0px black;
+  --nb-text-color: black;
+  --nb-accent-primary: #0066ff; // Örnek Mavi
+  --nb-accent-secondary: #ffd700; // Örnek Sarı
+  --nb-font-family: 'Space Mono', monospace;
+}
+*/
+
+/* Sayfa Konteyneri (Ana sayfa CSS'inden gelen stilleri ezer veya tamamlar) */
+.patients-page-container.container-fluid {
+  /* CContainer fluid'i hedefle */
+  /* background-color: var(--nb-background, #f8f7f2); */ /* Ana sayfa arkaplanını kullanabilir */
+  padding-top: 2rem; /* Sayfa üst boşluğu */
+  padding-bottom: 2rem; /* Sayfa alt boşluğu */
+}
+
+/* Sayfa Başlığı ve Üst Butonlar Alanı */
+.patients-page-container .row.mb-4.align-items-center {
+  /* Başlık ve Yeni Ekle butonunu içeren CRow */
+  /* Bu CRow için özel bir arka plan veya border gerekirse eklenebilir */
+}
+
+.patients-page-container .page-title.h2 {
+  /* CCol içindeki h2'yi hedefle */
+  font-family: var(--nb-font-family, "Space Mono", monospace);
+  color: var(--nb-text-color, black);
+  font-weight: 700;
+  font-size: 1.8rem; /* Daha büyük başlık */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0; /* CCol hizalamasıyla yönetilecek */
+}
+.patients-page-container .page-title .icon {
+  /* CIcon */
+  margin-right: 0.75rem;
+  vertical-align: -0.15em; /* İkonu metinle daha iyi hizala */
+}
+
+/* Yeni Hasta Ekle Butonu */
+.patients-page-container .btn-primary {
+  /* CButton color="primary" */
+  font-family: var(--nb-font-family, "Space Mono", monospace);
+  background-color: var(--nb-accent-primary, #0066ff);
+  color: white; /* Beyaz metin */
+  border: 2px solid var(--nb-text-color, black);
+  box-shadow: 4px 4px 0px var(--nb-text-color, black);
+  border-radius: 0; /* Keskin köşeler */
+  font-weight: 700;
+  padding: 0.6rem 1.2rem;
+  text-transform: uppercase;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out,
+    background-color 0.2s ease-out;
+}
+.patients-page-container .btn-primary:hover {
+  background-color: hsl(
+    from var(--nb-accent-primary) h s calc(l - 10%)
+  ); /* Rengi biraz koyulaştır */
+  color: white;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--nb-text-color, black);
+}
+.patients-page-container .btn-primary:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px var(--nb-text-color, black);
+}
+.patients-page-container .btn-primary .icon {
+  /* CIcon */
+  margin-right: 0.5rem;
+  font-size: 1.1em;
+}
+
+/* Filtre Kartı (CCard className="mb-4 shadow-sm") */
+/* Eğer filtreler için components.css'te .neubrutalist-filters gibi bir stil
+   kullanılıyorsa, o stil burayı ezecektir veya burada daha spesifik
+   bir seçici kullanmak gerekebilir. Şimdilik genel CoreUI kartını hedefliyoruz. */
+.patients-page-container .card.mb-4.shadow-sm {
+  background-color: transparent; /* Şeffaf yapabiliriz veya sabit renk */
+  /* background-color: #fff; */
+  border: var(--nb-border, 3px solid black);
+  box-shadow: var(--nb-shadow, 6px 6px 0px black);
+  border-radius: 0;
+  padding: 0; /* CCardBody kendi padding'ini yönetecek */
+}
+.patients-page-container .card.mb-4.shadow-sm .card-body {
+  /* CCardBody */
+  padding: 1.5rem; /* İç boşluk */
+}
+.patients-page-container .card .form-label.small.fw-semibold {
+  /* CFormLabel */
+  font-family: var(--nb-font-family, "Space Mono", monospace);
+  color: var(--nb-text-color, black);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.patients-page-container .card .input-group .input-group-text {
+  /* CInputGroupText */
+  background-color: transparent;
+  border: 2px solid var(--nb-text-color, black);
+  border-right: none;
+  border-radius: 0;
+  padding: 0.6rem 0.75rem;
+}
+.patients-page-container .card .input-group .form-control, /* CFormInput */
+.patients-page-container .card .form-select {
+  /* Standart select veya CFormSelect */
+  font-family: var(--nb-font-family, "Space Mono", monospace);
+  background-color: white;
+  border: 2px solid var(--nb-text-color, black);
+  border-radius: 0;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+  box-shadow: none;
+  color: var(--nb-text-color, black);
+}
+.patients-page-container .card .input-group .form-control:focus,
+.patients-page-container .card .form-select:focus {
+  border-color: var(--nb-accent-primary, #0066ff); /* Fokus border rengi */
+  box-shadow: 0 0 0 2px hsla(from var(--nb-accent-primary) h s l / 0.3); /* Fokus gölgesi */
+  outline: none;
+}
+/* Select oku için (eğer standart select kullanılıyorsa) */
+.patients-page-container .card .form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23111111' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 12px 12px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.5rem; /* Ok için yer */
+}
+
+/* Filtreleri Temizle Butonu */
+.patients-page-container .card .btn-light {
+  /* CButton color="light" */
+  font-family: var(--nb-font-family, "Space Mono", monospace);
+  background-color: var(--nb-accent-secondary, #ffd700);
+  color: var(--nb-text-color, black);
+  border: 2px solid var(--nb-text-color, black);
+  box-shadow: 3px 3px 0px var(--nb-text-color, black);
+  border-radius: 0;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  text-transform: uppercase;
+  width: 100%; /* Mobil için tam genişlik */
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out,
+    background-color 0.2s ease-out;
+}
+.patients-page-container .card .btn-light:hover {
+  background-color: hsl(from var(--nb-accent-secondary) h s calc(l - 10%));
+  color: var(--nb-text-color, black);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px var(--nb-text-color, black);
+}
+.patients-page-container .card .btn-light:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--nb-text-color, black);
+}
+
+/* Hata ve Bilgi Alertleri (CAlert) */
+.patients-page-container .alert {
+  /* Genel CAlert üzerine */
+  border: 2px solid var(--nb-text-color, black);
+  box-shadow: 4px 4px 0px var(--nb-text-color, black);
+  border-radius: 0;
+  font-family: var(--nb-font-family, "Space Mono", monospace);
+  font-weight: 500;
+  padding: 1rem 1.25rem;
+}
+.patients-page-container .alert.alert-danger {
+  background-color: var(--nb-accent-primary, #ff5252); /* Kırmızı */
+  color: white;
+  border-color: var(--nb-text-color, black); /* Border her zaman siyah kalsın */
+}
+.patients-page-container .alert.alert-info {
+  background-color: var(--nb-accent-secondary, #ffcc00); /* Sarı */
+  color: var(--nb-text-color, black);
+  border-color: var(--nb-text-color, black);
+}
+.patients-page-container .alert.alert-warning {
+  background-color: var(--nb-accent-warning, #ff9800); /* Turuncu */
+  color: var(--nb-text-color, black);
+  border-color: var(--nb-text-color, black);
+}
+
+/* PatientDataTable'ı içeren CCard için özel stil */
+/* Bu sınıf PatientDataTable.jsx içindeki CCard'a eklenmeli: className="mb-0 data-table-nb" */
+.data-table-nb.card {
+  border: var(--nb-border, 3px solid black);
+  box-shadow: var(--nb-shadow, 6px 6px 0px black);
+  border-radius: 0;
+  background-color: white; /* Tablo için beyaz arka plan */
+}
+.data-table-nb .card-header {
+  background-color: transparent;
+  border-bottom: 2px solid var(--nb-text-color, black);
+  padding: 1rem 1.25rem;
+}
+.data-table-nb .card-header .card-title {
+  /* h5 */
+  font-family: var(--nb-font-family, "Space Mono", monospace);
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: var(--nb-text-color, black);
+}
+.data-table-nb .table {
+  /* CTable */
+  font-family: var(--nb-font-family, "Space Mono", monospace);
+  color: var(--nb-text-color, black);
+}
+.data-table-nb .table thead th {
+  /* CTableHeaderCell */
+  background-color: var(
+    --nb-accent-secondary,
+    #ffd700
+  ); /* Başlık için vurgu rengi */
+  border-bottom: 2px solid var(--nb-text-color, black) !important; /* Önemli! */
+  border-right: 1px solid var(--nb-text-color, black);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  padding: 0.75rem;
+}
+.data-table-nb .table thead th:last-child {
+  border-right: none;
+}
+.data-table-nb .table tbody td {
+  /* CTableDataCell */
+  border-right: 1px dashed var(--nb-text-color, black);
+  padding: 0.6rem 0.75rem;
+  vertical-align: middle;
+}
+.data-table-nb .table tbody td:last-child {
+  border-right: none;
+}
+.data-table-nb .table tbody tr:nth-child(even) {
+  background-color: #f0f0f0; /* Hafif zebra deseni */
+}
+.data-table-nb .pagination {
+  /* CPagination */
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 2px solid var(--nb-text-color, black);
+}
+.data-table-nb .pagination .page-item .page-link {
+  /* CPaginationItem > CLink */
+  font-family: var(--nb-font-family, "Space Mono", monospace);
+  background-color: white;
+  color: var(--nb-text-color, black);
+  border: 2px solid var(--nb-text-color, black);
+  border-radius: 0;
+  margin: 0 0.2rem;
+  padding: 0.4rem 0.7rem;
+  box-shadow: 2px 2px 0px var(--nb-text-color, black);
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out,
+    background-color 0.2s ease-out;
+}
+.data-table-nb .pagination .page-item.active .page-link {
+  background-color: var(--nb-accent-primary, #0066ff);
+  color: white;
+  border-color: var(--nb-text-color, black);
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+.data-table-nb .pagination .page-item:not(.active) .page-link:hover {
+  background-color: var(--nb-accent-secondary, #ffd700);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px var(--nb-text-color, black);
+}
+.data-table-nb .pagination .page-item.disabled .page-link {
+  background-color: #e0e0e0;
+  color: #999;
+  border-color: #ccc;
+  box-shadow: none;
+}
+
+/* Responsive Ayarlamalar */
+@media (max-width: 767px) {
+  /* md altı */
+  .patients-page-container .page-title.h2 {
+    font-size: 1.5rem;
+  }
+  .patients-page-container .btn-primary {
+    width: 100%; /* Buton mobil'de tam genişlik */
+    margin-top: 0.5rem; /* Başlıktan sonra boşluk */
+  }
+  .patients-page-container .card.mb-4.shadow-sm .card-body {
+    padding: 1rem;
+  }
+  .neubrutalist-filters .filters-body {
+    /* Bu components.css'de olabilir */
+    gap: 1rem;
+  }
+  .data-table-nb .table {
+    font-size: 0.8rem; /* Mobilde tablo yazısı biraz küçülebilir */
+  }
+}

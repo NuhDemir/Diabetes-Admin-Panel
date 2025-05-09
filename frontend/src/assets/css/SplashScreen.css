@@ -1,0 +1,211 @@
+/* frontend/src/assets/css/SplashScreen.css */
+
+/* Google Fonts import */
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
+
+/* Animasyonlar */
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-5px, 5px);
+  }
+  40% {
+    transform: translate(-5px, -5px);
+  }
+  60% {
+    transform: translate(5px, 5px);
+  }
+  80% {
+    transform: translate(5px, -5px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Ana Konteyner */
+.splash-screen-neu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background-color: #f8f7f2; /* Kemik beyazı arka plan */
+  overflow: hidden;
+  position: relative;
+}
+
+.splash-screen-neu::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background-color: #ff3333; /* Kırmızı üst şerit */
+  z-index: 1;
+}
+
+.splash-screen-neu::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background-color: #0066ff; /* Mavi alt şerit */
+  z-index: 1;
+}
+
+/* İçerik Kutusu */
+.splash-content-neu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem;
+  background-color: #ffffff;
+  border: 5px solid #000000;
+  box-shadow: 15px 15px 0px #ff3333; /* Kırmızı gölge */
+  max-width: 90%;
+  width: 600px;
+  position: relative;
+  transform: rotate(-1deg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.splash-content-neu:hover {
+  transform: rotate(1deg) translateY(-5px);
+  box-shadow: 20px 20px 0px #ff3333;
+}
+
+.splash-content-neu::before {
+  content: "";
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 50px;
+  height: 50px;
+  background-color: #ffcc00; /* Sarı köşe aksan */
+  border: 3px solid #000000;
+  transform: rotate(15deg);
+  z-index: -1;
+}
+
+/* Başlık */
+.splash-title-neu {
+  font-family: "Space Mono", monospace;
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background-color: #000000;
+  color: #ffffff;
+  transform: rotate(-2deg);
+  position: relative;
+  letter-spacing: -1px;
+  text-align: center;
+}
+
+.splash-title-neu::after {
+  content: "Uluslararası FuAy Hastanesi";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  color: #ff3333;
+  z-index: -1;
+  animation: glitch 5s infinite;
+}
+
+/* Alt Başlık */
+.splash-subtitle-neu {
+  font-family: "Space Mono", monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 1.5rem 0;
+  padding: 0.5rem 1rem;
+  background-color: #0066ff; /* Mavi arka plan */
+  color: #ffffff;
+  transform: rotate(1deg);
+  text-align: center;
+  box-shadow: 5px 5px 0px #000000;
+}
+
+/* Yükleyici Konteyner */
+.splash-spinner-wrapper-neu {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 3px dashed #000000;
+  position: relative;
+  animation: float 3s ease-in-out infinite;
+}
+
+.splash-spinner-wrapper-neu::before {
+  content: "Yükleniyor...";
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  animation: blink 1s infinite;
+}
+
+/* Logo */
+.splash-logo-neu {
+  max-width: 120px;
+  margin-bottom: 1rem;
+  filter: drop-shadow(3px 3px 0px #000000);
+}
+
+/* Pikseller için oluşturucu sınıf */
+.pixel-decoration {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: var(--pixel-color);
+  z-index: 0;
+}
+
+/* Piksel renkleri - JavaScript'ten ayarlanacak */
+.pixel-red {
+  --pixel-color: #ff3333;
+}
+.pixel-blue {
+  --pixel-color: #0066ff;
+}
+.pixel-yellow {
+  --pixel-color: #ffcc00;
+}
+.pixel-green {
+  --pixel-color: #00cc66;
+}
+.pixel-pink {
+  --pixel-color: #ff66cc;
+}

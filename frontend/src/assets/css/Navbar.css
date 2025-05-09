@@ -1,0 +1,166 @@
+/* frontend/src/assets/css/Navbar.css */
+
+:root {
+  --nb-navbar-bg: #ffffff; /* Beyaz arkaplan */
+  --nb-navbar-text: #111111; /* Siyah metin */
+  --nb-navbar-border: 3px solid #111111; /* Kalın siyah border */
+  --nb-navbar-shadow: 5px 5px 0px #111111; /* Sert gölge */
+  --nb-accent-yellow: #ffd700; /* Vurgu rengi - Altın Sarısı */
+  --nb-accent-blue: #0066ff; /* Vurgu rengi - Mavi */
+  --nb-font-family: "Space Mono", monospace; /* Neubrutalist font */
+}
+
+/* Temaya göre renkleri dinamik olarak ayarlamak için (opsiyonel, ThemeContext ile daha iyi) */
+body[data-coreui-theme="dark"] .nb-header {
+  --nb-navbar-bg: #1e1e1e;
+  --nb-navbar-text: #f0f0f0;
+  --nb-navbar-border: 3px solid #f0f0f0;
+  --nb-navbar-shadow: 5px 5px 0px #f0f0f0; /* Gölge de açık renk olabilir veya kaldırılabilir */
+  /* --nb-navbar-shadow: none; */
+}
+
+.nb-header.header {
+  /* CoreUI CHeader'ı hedefle */
+  background-color: var(--nb-navbar-bg);
+  border-bottom: var(--nb-navbar-border);
+  box-shadow: var(--nb-navbar-shadow);
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-radius: 0; /* Keskin köşeler */
+  transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; /* Tema geçişi için */
+}
+
+/* Marka (Logo ve Hastane Adı) */
+.nb-brand.header-brand {
+  /* CHeaderBrand'ı hedefle */
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--nb-navbar-text);
+  padding: 0.25rem 0;
+}
+.nb-brand-icon {
+  /* CIcon */
+  font-size: 1.8rem; /* İkon boyutu */
+  margin-right: 0.6rem;
+  color: var(--nb-navbar-text); /* İkon rengi */
+}
+.nb-brand-text {
+  font-family: var(--nb-font-family);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* Mobil Menü Toggler */
+.nb-toggler.header-toggler {
+  /* CHeaderToggler */
+  border: 2px solid var(--nb-navbar-text);
+  border-radius: 0;
+  padding: 0.25rem 0.5rem;
+}
+.nb-toggler.header-toggler .header-toggler-icon {
+  /* CIcon içindeki span */
+  background-image: none !important; /* CoreUI varsayılanını kaldır */
+  color: var(--nb-navbar-text); /* CIcon'un rengini alacak */
+}
+.nb-toggler.header-toggler:focus {
+  box-shadow: 0 0 0 0.2rem var(--nb-accent-yellow); /* Fokus efekti */
+}
+
+/* Navigasyon Linkleri */
+.nb-nav.header-nav {
+  /* CHeaderNav */
+  align-items: center; /* Temayı değiştirme butonuyla hizalamak için */
+}
+
+.nb-nav-item.nav-item {
+  /* CNavItem */
+  margin-left: 0.5rem; /* Linkler arası boşluk */
+}
+
+.nb-nav-link.nav-link {
+  /* CNavLink */
+  font-family: var(--nb-font-family);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--nb-navbar-text) !important; /* Önemli! CoreUI'yi ezmek için */
+  padding: 0.6rem 1rem;
+  border: 2px solid transparent; /* Hover için yer ayır */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  border-radius: 0;
+}
+
+.nb-nav-link.nav-link:hover,
+.nb-nav-link.nav-link.active {
+  background-color: var(--nb-accent-yellow);
+  color: var(--nb-navbar-text) !important;
+  border-color: var(--nb-navbar-text);
+  box-shadow: 3px 3px 0px var(--nb-navbar-text); /* Hover'da hafif gölge */
+  transform: translate(-1px, -1px);
+}
+.nb-nav-link.nav-link.active {
+  background-color: var(--nb-accent-blue); /* Aktif link için farklı renk */
+  color: var(--nb-navbar-bg) !important; /* Aktif link metni */
+}
+
+/* Tema Değiştirme Butonu */
+.nb-theme-toggle.btn {
+  /* Basit <button> için */
+  background-color: transparent;
+  border: 2px solid var(--nb-navbar-text);
+  color: var(--nb-navbar-text);
+  padding: 0.5rem; /* Kare buton için */
+  line-height: 1; /* İkonu ortalamak için */
+  border-radius: 0;
+  transition: background-color 0.2s, color 0.2s, transform 0.1s, box-shadow 0.1s;
+  box-shadow: 3px 3px 0px var(--nb-navbar-text);
+}
+.nb-theme-toggle.btn:hover {
+  background-color: var(--nb-navbar-text);
+  color: var(--nb-navbar-bg);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px var(--nb-navbar-text);
+}
+.nb-theme-toggle.btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--nb-navbar-text);
+}
+.nb-theme-toggle.btn .icon {
+  /* CIcon */
+  font-size: 1.3rem; /* İkon boyutu */
+}
+
+/* Mobil menü açıldığında (CCollapse) */
+.header-collapse.collapse.show {
+  background-color: var(--nb-navbar-bg);
+  border-top: var(--nb-navbar-border); /* Üst border */
+  margin-top: 0.75rem; /* Toggler ile arasında boşluk */
+  padding: 1rem 0; /* İç boşluk */
+  position: absolute; /* Akıştan çıkar */
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Diğer içeriklerin üzerinde */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hafif alt gölge */
+}
+@media (min-width: 992px) {
+  /* lg ve üzeri */
+  .header-collapse.collapse.show,
+  .header-collapse.collapsing {
+    /* Büyük ekranlarda bu stilleri sıfırla, çünkü menü her zaman açık */
+    background-color: transparent;
+    border-top: none;
+    margin-top: 0;
+    padding: 0;
+    position: static;
+    box-shadow: none;
+  }
+  .nb-nav.header-nav {
+    flex-direction: row !important; /* Navigasyon linklerini yan yana getir */
+  }
+  .nb-nav-item.nav-item {
+    margin-left: 1rem; /* Büyük ekranda linkler arası boşluk */
+  }
+}
