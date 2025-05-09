@@ -1,4 +1,4 @@
-[Fuay Hastanesi Diabetes Panel](https://github.com/NuhDemir/Diabetes-Admin-Panel/blob/main/img/image.png?raw=true)
+<img src="https://raw.githubusercontent.com/NuhDemir/Diabetes-Admin-Panel/refs/heads/main/img/image.png"/>
 
 # Uluslararası FuAy Hastanesi - Diyabet Analiz Paneli
 
