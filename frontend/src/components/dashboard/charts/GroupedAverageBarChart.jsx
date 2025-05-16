@@ -4,25 +4,26 @@ import { Bar } from "react-chartjs-2";
 import { commonChartOptions } from "../../../utils/chartUtils";
 
 const GroupedAverageBarChart = ({
-  chartData,
-  title,
+  chartData, // Bu prop backend'den { labels: [], datasets: [] } olarak gelecek
+  title = "Risk Gruplarına Göre Ortalama Metrikler", // ChartCard'dan gelen başlığa ek olarak
   yAxisLabel = "Ortalama Değer",
 }) => {
-  // Veri formatı zaten Chart.js'e uygun geldiği için useMemo'ya çok gerek yok ama tutarlılık için kalabilir
-  const data = useMemo(() => {
+  // Gelen veri zaten Chart.js formatında olduğu için doğrudan kullanılabilir
+  const dataForRender = useMemo(() => {
     if (
       !chartData ||
       !chartData.labels ||
       chartData.labels.length === 0 ||
       !chartData.datasets ||
-      chartData.datasets.length === 0
+      chartData.datasets.length === 0 ||
+      !chartData.datasets.every((ds) => ds.data && ds.data.length > 0) // Her dataset'te veri olduğundan emin ol
     ) {
       return null;
     }
     return chartData;
   }, [chartData]);
 
-  if (!data) return null;
+  if (!dataForRender) return null;
 
   const options = {
     ...commonChartOptions,
@@ -39,7 +40,7 @@ const GroupedAverageBarChart = ({
     plugins: {
       ...commonChartOptions.plugins,
       title: {
-        display: true,
+        display: !!title, // Grafik içi başlık (ChartCard'dan gelen başlığa ek)
         text: title,
         padding: { bottom: 15 },
       },
@@ -49,7 +50,7 @@ const GroupedAverageBarChart = ({
     },
   };
 
-  return <Bar data={data} options={options} />;
+  return <Bar data={dataForRender} options={options} />;
 };
 
 export default GroupedAverageBarChart;

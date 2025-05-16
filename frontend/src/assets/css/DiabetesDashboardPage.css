@@ -1,0 +1,75 @@
+/* frontend/src/assets/css/DiabetesDashboardPage.css */
+/* ... (mevcut stiller) ... */
+
+/* === Neubrutalist Sayfa Yükleyici Stilleri === */
+.neo-page-loader-overlay {
+  position: fixed; /* Tam ekran kaplama */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f0f0f0; /* Açık gri bir arka plan, çok dikkat çekmeyen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Her şeyin üzerinde */
+  font-family: "Arial", sans-serif; /* Basit, net bir font */
+}
+
+.neo-loader-box {
+  padding: 2rem 3rem;
+  background-color: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: 8px 8px 0px #000000; /* Sert gölge */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0; /* Keskin köşeler */
+}
+
+.neo-loader-bar {
+  width: 100px;
+  height: 10px;
+  background-color: #cccccc; /* Çubuk için temel renk */
+  border: 2px solid #000000;
+  position: relative;
+  overflow: hidden; /* Animasyonlu kısmın taşmasını engelle */
+  margin-bottom: 1.5rem; /* Metinle arasında boşluk */
+}
+
+.neo-loader-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  /*Başlangıçtasolda,görünmez*/
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  /*Siyahhareketlikısım*/
+  animation: neoLoad 0.5s linear infinite;
+  -webkit-animation: neoLoad 0.5s linear infinite;
+}
+
+.neo-loader-text {
+  font-size: 0.9rem; /* Biraz daha küçük */
+  font-weight: 700; /* Kalın */
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 2px; /* Harf aralığı */
+  margin: 0;
+}
+
+/* Yükleme çubuğu animasyonu */
+@keyframes neoLoad {
+  0% {
+    left: -100%; /* Başlangıç */
+  }
+  50% {
+    left: 0; /* Ortaya gelir */
+  }
+  100% {
+    left: 100%; /* Sağa doğru kayar, kaybolur */
+  }
+}

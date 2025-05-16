@@ -1,3 +1,4 @@
+// frontend/src/pages/PatientsPage.jsx
 import React, { useState, useMemo } from "react";
 import {
   CContainer,
@@ -5,17 +6,30 @@ import {
   CCol,
   CCard,
   CCardBody,
+  CCardHeader,
   CButton,
   CFormInput,
   CInputGroup,
   CInputGroupText,
   CAlert,
   CSpinner,
-  CFormLabel, // <-- EKSİK IMPORT'U EKLE
-  CFormSelect, // <-- CFormSelect de kullanılmış olabilir, kontrol et. Standart select kullandıysan gerek yok.
+  CFormLabel,
+  CFormSelect,
+  CBadge,
 } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
-import { cilSearch, cilUserPlus, cilFilterX, cilList } from "@coreui/icons";
+import {
+  cilSearch,
+  cilUserPlus,
+  cilFilterX,
+  cilMedicalCross,
+  cilSync, // Yenile ikonu
+} from "@coreui/icons";
+
+// ÖNEMLİ: useDiabetesData hook'u artık tüm dashboard verisini değil,
+// sadece ham hasta listesini getiren bir API çağrısı yapmalı veya
+// gelen dashboardData objesinden sadece hasta listesini (örn: `dashboardData.allRawPatients`) almalı.
+// Bu örnekte, useDiabetesData'nın `rawData` olarak ham hasta listesini döndürdüğünü varsayıyorum.
 import useDiabetesData from "../hooks/useDiabetesData";
 import PatientDataTable from "../components/dashboard/PatientDataTable";
 import { calculateRisk } from "../utils/riskHelper";
@@ -24,100 +38,128 @@ import "../assets/css/PatientsPage.css";
 
 const PatientsPage = () => {
   const {
-    rawData: allPatients,
+    rawData: allPatientsData, // Hook'tan gelen ham veri (belki yeniden adlandırılmalı)
     loading: dataLoading,
     error: dataError,
     refetchData,
-  } = useDiabetesData();
+  } = useDiabetesData(); // Bu hook şu anda tüm dashboard verisini getiriyor olabilir.
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRisk, setFilterRisk] = useState("All");
+  const [filterAgeMin, setFilterAgeMin] = useState("");
+  const [filterAgeMax, setFilterAgeMax] = useState("");
 
+  // Ham veriyi alıp, her hasta için risk seviyesini ve aranabilir metni hesapla
   const processedPatients = useMemo(() => {
-    if (!allPatients) return [];
-    return allPatients.map((patient) => ({
+    // Eğer useDiabetesData dashboard verisi döndürüyorsa,
+    // ham hasta listesini oradan almanız gerekir.
+    // Örneğin: const patientsToProcess = allPatientsData?.rawPatientList || [];
+    // Şimdilik allPatientsData'nın doğrudan hasta listesi olduğunu varsayalım.
+    const patientsToProcess = Array.isArray(allPatientsData)
+      ? allPatientsData
+      : [];
+
+    if (patientsToProcess.length === 0) return [];
+
+    return patientsToProcess.map((patient) => ({
       ...patient,
       RiskLevel: calculateRisk(patient),
-      searchableText:
-        `${patient.Age} ${patient.Glucose} ${patient.BMI}`.toLowerCase(),
+      // Aranacak metinleri daha kapsamlı hale getirelim
+      searchableText: `${patient.Age || ""} ${patient.Glucose || ""} ${
+        patient.BMI || ""
+      } ${patient["BloodPressure (mg/dL)"] || ""} ${
+        patient.Pregnancies || ""
+      } ${patient.DiabetesPedigreeFunction || ""} ${patient.Insulin || ""} ${
+        patient.SkinThickness || ""
+      }`.toLowerCase(),
     }));
-  }, [allPatients]);
+  }, [allPatientsData]);
 
+  // Filtreleme mantığı
   const filteredPatients = useMemo(() => {
-    if (!processedPatients) return [];
+    if (!processedPatients || processedPatients.length === 0) return [];
     return processedPatients.filter((patient) => {
       const lowerSearchTerm = searchTerm.toLowerCase();
+      const minAge = filterAgeMin === "" ? 0 : parseInt(filterAgeMin, 10);
+      const maxAge =
+        filterAgeMax === "" ? Infinity : parseInt(filterAgeMax, 10);
+
       let matchesSearch = true;
       let matchesRisk = true;
+      let matchesAge = true;
 
       if (searchTerm) {
-        matchesSearch =
-          patient.searchableText.includes(lowerSearchTerm) ||
-          String(patient.Age).includes(lowerSearchTerm) ||
-          String(patient.Glucose).includes(lowerSearchTerm) ||
-          String(patient.BMI).includes(lowerSearchTerm);
+        matchesSearch = patient.searchableText.includes(lowerSearchTerm);
       }
 
       if (filterRisk !== "All" && patient.RiskLevel !== filterRisk) {
         matchesRisk = false;
       }
-      return matchesSearch && matchesRisk;
+
+      // Yaş kontrolü (patient.Age tanımsız veya null değilse)
+      if (patient.Age !== undefined && patient.Age !== null) {
+        if (patient.Age < minAge || patient.Age > maxAge) {
+          matchesAge = false;
+        }
+      } else if (filterAgeMin !== "" || filterAgeMax !== "") {
+        // Yaş filtresi varsa ve hastanın yaşı yoksa eşleşmez
+        matchesAge = false;
+      }
+
+      return matchesSearch && matchesRisk && matchesAge;
     });
-  }, [processedPatients, searchTerm, filterRisk]);
+  }, [processedPatients, searchTerm, filterRisk, filterAgeMin, filterAgeMax]);
 
   const handleClearFilters = () => {
     setSearchTerm("");
     setFilterRisk("All");
+    setFilterAgeMin("");
+    setFilterAgeMax("");
   };
 
-  if (dataLoading && (!allPatients || allPatients.length === 0)) {
+  const activeFilterCount = [
+    searchTerm !== "",
+    filterRisk !== "All",
+    filterAgeMin !== "" || filterAgeMax !== "",
+  ].filter(Boolean).length;
+
+  // Yüklenme ve Hata Durumları
+  const initialLoad =
+    dataLoading && (!allPatientsData || allPatientsData.length === 0);
+  const initialError =
+    dataError && (!allPatientsData || allPatientsData.length === 0);
+  const noDataAfterLoad =
+    !dataLoading &&
+    !dataError &&
+    (!allPatientsData || allPatientsData.length === 0);
+
+  if (initialLoad) {
     return (
-      <div
-        className="page-loading-spinner"
-        style={{ minHeight: "calc(100vh - 150px)" }}
-      >
-        <CSpinner color="primary" style={{ width: "3rem", height: "3rem" }} />
-        <p className="mt-3 text-muted">Hasta verileri yükleniyor...</p>
+      <div className="page-loading-spinner">
+        <CSpinner color="primary" />
+        <p>Hasta verileri yükleniyor...</p>
       </div>
     );
   }
 
-  if (dataError && (!allPatients || allPatients.length === 0)) {
+  if (initialError) {
     return (
       <CContainer className="mt-4">
-        <CAlert color="danger" className="text-center">
-          Hasta verileri yüklenirken bir hata oluştu: {dataError}
-          <br />
+        <CAlert color="danger" className="text-center py-4 neu-brutal-alert">
+          <h4>
+            <CIcon icon={cilMedicalCross} size="xl" className="me-2" /> Veri
+            Yükleme Hatası
+          </h4>
+          <p className="mb-2">
+            Hasta verileri yüklenirken bir sorun oluştu:{" "}
+            {dataError.message || dataError}
+          </p>
           <CButton
-            color="danger-ghost"
-            size="sm"
+            color="light"
             onClick={refetchData}
-            className="mt-2"
+            className="mt-2 neu-brutal-button"
           >
-            Tekrar Dene
-          </CButton>
-        </CAlert>
-      </CContainer>
-    );
-  }
-
-  if (
-    !dataLoading &&
-    !dataError &&
-    (!allPatients || allPatients.length === 0)
-  ) {
-    return (
-      <CContainer className="mt-4">
-        <CAlert color="info" className="text-center">
-          Sistemde kayıtlı hasta bulunmamaktadır.
-          <br />
-          <CButton
-            color="primary"
-            className="mt-3"
-            onClick={() => alert("Yeni hasta ekleme formu açılacak.")}
-          >
-            <CIcon icon={cilUserPlus} className="me-2" />
-            Yeni Hasta Ekle
+            <CIcon icon={cilSync} className="me-1" /> Tekrar Dene
           </CButton>
         </CAlert>
       </CContainer>
@@ -125,87 +167,134 @@ const PatientsPage = () => {
   }
 
   return (
-    <CContainer fluid className="patients-page-container py-4 px-lg-4">
-      <CRow className="mb-4 align-items-center">
+    <CContainer fluid className="patients-page-container">
+      <CRow className="page-header-row mb-4 align-items-center">
         <CCol xs={12} md>
-          <h2 className="mb-3 mb-md-0 page-title">
-            <CIcon icon={cilList} className="me-2" />
-            Hasta Listesi
+          <h2 className="page-main-title">
+            <CIcon icon={cilFilterX} className="me-2 page-title-icon" />
+            Hasta Yönetim Paneli
           </h2>
         </CCol>
-        <CCol xs={12} md="auto" className="text-md-end">
+        <CCol xs={12} md="auto" className="d-flex gap-2 mt-3 mt-md-0">
           <CButton
-            color="primary"
-            onClick={() => alert("Yeni hasta ekleme formu açılacak.")}
+            color="info"
+            variant="outline"
+            onClick={refetchData}
+            className="refresh-data-btn"
+            disabled={dataLoading}
+          >
+            <CIcon icon={cilSync} className="me-1" />{" "}
+            {dataLoading ? "Yenileniyor..." : "Yenile"}
+          </CButton>
+          <CButton
+            color="success"
+            className="add-patient-button"
+            onClick={() => alert("Yeni hasta ekleme formu/modalı açılacak.")}
           >
             <CIcon icon={cilUserPlus} className="me-2" />
-            Yeni Hasta Ekle
+            Yeni Hasta
           </CButton>
         </CCol>
       </CRow>
 
-      <CCard className="mb-4 shadow-sm">
+      <CCard className="mb-4 filter-card neu-brutal-card">
+        <CCardHeader className="filter-card-header">
+          <h5 className="mb-0 filter-card-title">
+            Filtreleme Seçenekleri
+            {activeFilterCount > 0 && (
+              <CBadge
+                color="primary"
+                shape="pill"
+                className="ms-2 filter-count-badge"
+              >
+                {activeFilterCount} aktif filtre
+              </CBadge>
+            )}
+          </h5>
+        </CCardHeader>
         <CCardBody>
           <CRow className="g-3 align-items-end">
-            <CCol md={6} lg={4}>
-              {/* CFormLabel burada kullanılıyor, import edildiğinden emin ol */}
-              <CFormLabel htmlFor="searchTerm" className="fw-semibold small">
-                Hasta Ara (Yaş, Glikoz, BMI)
+            <CCol md={5} lg={4}>
+              <CFormLabel htmlFor="searchTermInput" className="filter-label">
+                Hızlı Ara
               </CFormLabel>
-              <CInputGroup>
+              <CInputGroup className="search-input-group">
                 <CInputGroupText>
-                  <CIcon icon={cilSearch} />
+                  {" "}
+                  <CIcon icon={cilSearch} />{" "}
                 </CInputGroupText>
                 <CFormInput
                   type="text"
-                  id="searchTerm"
-                  placeholder="Arama terimi girin..."
+                  id="searchTermInput"
+                  placeholder="Yaş, Glikoz, BMI vb."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </CInputGroup>
             </CCol>
-            <CCol md={6} lg={3}>
-              {/* CFormLabel burada kullanılıyor */}
-              <CFormLabel htmlFor="filterRisk" className="fw-semibold small">
-                Risk Seviyesine Göre Filtrele
+
+            <CCol sm={6} md={3} lg={2}>
+              <CFormLabel htmlFor="riskFilterSelect" className="filter-label">
+                Risk Seviyesi
               </CFormLabel>
-              {/* Eğer CFormSelect kullanacaksanız, onu da import etmeniz gerekir.
-                  Önceki kodda standart <select> kullanılmıştı.
-                  Eğer CFormSelect ise:
-                  <CFormSelect
-                    id="filterRisk"
-                    value={filterRisk}
-                    onChange={(e) => setFilterRisk(e.target.value)}
-                    options={[
-                      { label: 'Tüm Risk Seviyeleri', value: 'All' },
-                      { label: 'Yüksek Risk', value: 'Yüksek' },
-                      { label: 'Orta Risk', value: 'Orta' },
-                      { label: 'Düşük Risk', value: 'Düşük' },
-                      { label: 'Bilinmiyor', value: 'Bilinmiyor' },
-                    ]}
-                  />
-                  Eğer standart select ise, CFormLabel'in importu yeterli.
-              */}
-              <select
-                id="filterRisk"
-                className="form-select"
+              <CFormSelect
+                id="riskFilterSelect"
                 value={filterRisk}
                 onChange={(e) => setFilterRisk(e.target.value)}
-              >
-                <option value="All">Tüm Risk Seviyeleri</option>
-                <option value="Yüksek">Yüksek Risk</option>
-                <option value="Orta">Orta Risk</option>
-                <option value="Düşük">Düşük Risk</option>
-                <option value="Bilinmiyor">Bilinmiyor</option>
-              </select>
+                options={[
+                  { label: "Tümü", value: "All" },
+                  { label: "Yüksek", value: "Yüksek" },
+                  { label: "Orta", value: "Orta" },
+                  { label: "Düşük", value: "Düşük" },
+                  { label: "Bilinmiyor", value: "Bilinmiyor" },
+                ]}
+              />
             </CCol>
-            <CCol xs={12} lg="auto">
+
+            <CCol sm={12} md={4} lg={3}>
+              <CFormLabel className="filter-label">Yaş Aralığı</CFormLabel>
+              <CRow className="g-2 align-items-center">
+                <CCol>
+                  {" "}
+                  <CFormInput
+                    type="number"
+                    placeholder="Min"
+                    value={filterAgeMin}
+                    onChange={(e) => setFilterAgeMin(e.target.value)}
+                    min="0"
+                  />{" "}
+                </CCol>
+                <CCol
+                  xs="auto"
+                  className="px-0 text-center filter-age-separator"
+                >
+                  {" "}
+                  –{" "}
+                </CCol>
+                <CCol>
+                  {" "}
+                  <CFormInput
+                    type="number"
+                    placeholder="Max"
+                    value={filterAgeMax}
+                    onChange={(e) => setFilterAgeMax(e.target.value)}
+                    min="0"
+                  />{" "}
+                </CCol>
+              </CRow>
+            </CCol>
+
+            <CCol
+              xs={12}
+              lg={3}
+              className="d-flex align-items-end mt-3 mt-lg-0"
+            >
               <CButton
-                color="light"
+                color="secondary" // CoreUI secondary rengi
                 variant="outline"
                 onClick={handleClearFilters}
-                className="w-100"
+                className="w-100 clear-filters-btn neu-brutal-button"
+                disabled={activeFilterCount === 0}
               >
                 <CIcon icon={cilFilterX} className="me-1" /> Filtreleri Temizle
               </CButton>
@@ -214,7 +303,34 @@ const PatientsPage = () => {
         </CCardBody>
       </CCard>
 
-      <PatientDataTable data={filteredPatients} className="mb-0" />
+      {/* Yüklenme ve Veri Yok Durumu (Veri tablosu için) */}
+      {dataLoading &&
+        allPatientsData &&
+        allPatientsData.length > 0 && ( // Veri yenilenirken spinner
+          <div className="text-center py-3">
+            <CSpinner size="sm" /> Tablo güncelleniyor...
+          </div>
+        )}
+
+      {!noDataAfterLoad ? (
+        <PatientDataTable
+          data={filteredPatients}
+          loading={
+            dataLoading && (!allPatientsData || allPatientsData.length === 0)
+          }
+          className="mb-0"
+        />
+      ) : (
+        <CAlert color="info" className="text-center py-4 neu-brutal-alert">
+          <h4>
+            <CIcon icon={cilUserPlus} size="xl" className="me-2" /> Kayıtlı
+            Hasta Bulunmuyor
+          </h4>
+          <p className="mb-2">
+            Sistemde henüz kayıtlı hasta verisi bulunmamaktadır.
+          </p>
+        </CAlert>
+      )}
     </CContainer>
   );
 };

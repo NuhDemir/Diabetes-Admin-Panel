@@ -36,7 +36,7 @@ const ChartCard = ({
   useEffect(() => {
     // Animate content when loading completes
     if (!isLoading) {
-      const timer = setTimeout(() => setFadeIn(true), 100);
+      const timer = setTimeout(() => setFadeIn(true), 10);
       return () => clearTimeout(timer);
     }
     return () => setFadeIn(false);

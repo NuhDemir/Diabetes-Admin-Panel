@@ -11,7 +11,7 @@ import "./assets/css/Navbar.css";
 import "./assets/css/main.css";
 // import "./assets/css/PatientsPage.css"; // Sayfa özelindeki CSS'i burada veya sayfada import et
 
-const SPLASH_DURATION = 3000;
+const SPLASH_DURATION = 0;
 
 // Sayfaları lazy loading ile yükleyelim (performans için)
 const DiabetesDashboardPage = React.lazy(() =>
@@ -21,12 +21,10 @@ const PatientsPage = React.lazy(() => import("./pages/PatientsPage")); // Yeni s
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
-  // isContentLoaded state'i artık her sayfa için Suspense ile yönetilebilir
-  // const [isContentLoaded, setIsContentLoaded] = useState(false);
 
   useEffect(() => {
     const splashTimer = setTimeout(() => setShowSplash(false), SPLASH_DURATION);
-    // const contentTimer = setTimeout(() => setIsContentLoaded(true), SPLASH_DURATION + 300);
+
     return () => {
       clearTimeout(splashTimer);
       // clearTimeout(contentTimer);

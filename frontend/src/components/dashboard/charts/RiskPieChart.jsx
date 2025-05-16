@@ -8,19 +8,22 @@ import {
 } from "../../../utils/chartUtils";
 
 const RiskPieChart = ({ distributionData }) => {
-  // Grafik için veriyi useMemo ile hazırla
-  const chartData = useMemo(() => {
+  // Prop adı distributionData olarak kalabilir
+  const chartDataForRender = useMemo(() => {
+    // distributionData { labels: [], data: [] } formatında gelmeli
     if (
       !distributionData ||
       !distributionData.labels ||
-      distributionData.labels.length === 0
+      distributionData.labels.length === 0 ||
+      !distributionData.data ||
+      distributionData.data.length === 0
     ) {
-      return null; // Veri yoksa null döndür
+      return null;
     }
-    // Renkleri etiketlere göre eşleştir
+
     const backgroundColors = distributionData.labels.map(
       (label) => riskColors[label] || "rgba(201, 203, 207, 0.7)"
-    ); // Varsayılan gri
+    );
     const borderColors = distributionData.labels.map(
       (label) => riskBorderColors[label] || "rgba(201, 203, 207, 1)"
     );
@@ -29,7 +32,7 @@ const RiskPieChart = ({ distributionData }) => {
       labels: distributionData.labels,
       datasets: [
         {
-          label: "Hasta Sayısı",
+          label: "Hasta Sayısı", // Lejant için
           data: distributionData.data,
           backgroundColor: backgroundColors,
           borderColor: borderColors,
@@ -37,17 +40,13 @@ const RiskPieChart = ({ distributionData }) => {
         },
       ],
     };
-  }, [distributionData]); // distributionData değiştiğinde yeniden hesapla
+  }, [distributionData]);
 
-  if (!chartData) {
-    // Bileşen içinde veri yoksa mesaj göstermek yerine ChartCard halleder.
-    // İsterseniz burada da bir mesaj gösterebilirsiniz.
-    return null;
-  }
+  if (!chartDataForRender) return null;
 
-  const options = getPieOptions("Diyabet Risk Segmentasyonu");
+  const options = getPieOptions("Diyabet Risk Segmentasyonu"); // Grafik başlığı
 
-  return <Pie data={chartData} options={options} />;
+  return <Pie data={chartDataForRender} options={options} />;
 };
 
 export default RiskPieChart;

@@ -1,74 +1,111 @@
 // frontend/src/components/dashboard/charts/DistributionBarChart.jsx
-
 import React, { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
-// Renkleri ve opsiyonları utils'den alalım
 import {
+  commonChartOptions,
   glucoseColor,
   glucoseBorderColor,
   bpColor,
   bpBorderColor,
 } from "../../../utils/chartUtils";
 
-// --- ÖNEMLİ: Prop olarak title='' şeklinde varsayılan değer atamak iyi bir pratiktir ---
 const DistributionBarChart = ({
-  chartData,
+  chartData, // Bu artık { labels: [...], data: [...] } şeklinde bir obje
   title = "",
-
+  xAxisLabel = "Aralık",
   yAxisLabel = "Hasta Sayısı",
 }) => {
-  const data = useMemo(() => {
-    if (!chartData || !chartData.labels || chartData.labels.length === 0)
+  const dataForRender = useMemo(() => {
+    // chartData bir obje ve içinde labels ve data dizileri olmalı
+    // chartData.data, sayıları içeren dizi (eski counts)
+    // chartData.labels, etiketleri içeren dizi
+    if (
+      !chartData ||
+      !chartData.labels ||
+      !chartData.data ||
+      chartData.labels.length === 0 ||
+      chartData.data.length === 0
+    ) {
       return null;
+    }
 
-    let bgColor = bpColor; // Varsayılan renk (örn: mavi)
+    // Backend'den gelen formatı doğrudan kullanabiliriz
+    const labels = chartData.labels;
+    const counts = chartData.data; // Bu artık doğrudan sayı dizisi
+
+    let bgColor = bpColor; // Varsayılan renk
     let brdrColor = bpBorderColor;
 
-    // --- GÜVENLİ KONTROL EKLENDİ ---
-    // title prop'u varsa ve string ise işlem yap, yoksa varsayılan renkler kalsın.
-    // Optional Chaining (?.) ve Nullish Coalescing (??) kullanarak daha güvenli hale getirelim:
-    const lowerCaseTitle = title?.toLowerCase() ?? ""; // Eğer title null veya undefined ise boş string ata
+    // Grafik içi başlık (opsiyonel), ChartCard başlığına ek olarak.
+    // title prop'u DistributionBarChart'a ChartCard'dan gelmiyor,
+    // dolayısıyla bu title, bu bileşene özel bir iç başlık olabilir veya kaldırılabilir.
+    // Eğer ChartCard'daki title'a göre renk değişimi isteniyorsa, bu title prop'u
+    // DiabetesDashboardPage'den buraya kadar taşınmalı.
+    // Şimdilik, bu bileşene özel bir title prop'u olmadığını varsayarak basitleştirelim
+    // ve renk seçimini daha genel bir yolla yapalım veya kaldıralım.
+    // Veya, ChartCard'ın title'ını buraya prop olarak geçirelim.
+    // Bu örnekte, bu iç title'ı kullanmaya devam edelim, ama ChartCard'dan gelmeli.
 
-    if (lowerCaseTitle.includes("bmi")) {
-      // Şimdi lowerCaseTitle üzerinde güvenle çalışabiliriz
-      bgColor = glucoseColor; // BMI için farklı renk (örn: kırmızı)
+    const lowerCaseInternalTitle = title?.toLowerCase() ?? "";
+
+    if (lowerCaseInternalTitle.includes("bmi")) {
+      bgColor = glucoseColor;
       brdrColor = glucoseBorderColor;
-    } else if (lowerCaseTitle.includes("gebelik")) {
-      bgColor = "rgba(75, 192, 192, 0.6)"; // Yeşil tonu
+    } else if (lowerCaseInternalTitle.includes("gebelik")) {
+      bgColor = "rgba(75, 192, 192, 0.6)";
       brdrColor = "rgba(75, 192, 192, 1)";
+    } else if (
+      lowerCaseInternalTitle.includes("yaş") ||
+      lowerCaseInternalTitle.includes("age")
+    ) {
+      // Yaş için varsayılan bpColor/mavi kalabilir veya farklı bir renk atanabilir.
+      // Örneğin:
+      // bgColor = "rgba(153, 102, 255, 0.6)"; // Mor
+      // brdrColor = "rgba(153, 102, 255, 1)";
     }
-    // Yaş için varsayılan bpColor (mavi) kullanılacak.
 
     return {
-      labels: chartData.labels,
+      labels: labels,
       datasets: [
         {
           label: yAxisLabel,
-          data: chartData.data,
+          data: counts,
           backgroundColor: bgColor,
           borderColor: brdrColor,
           borderWidth: 1,
         },
       ],
     };
-  }, [chartData, title, yAxisLabel]); // Bağımlılıklar
+  }, [chartData, title, yAxisLabel]); // title prop'u da bağımlılıklara eklendi
 
-  if (!data) return null; // Eğer hesaplanan data null ise hiçbir şey render etme
+  if (!dataForRender) return null;
 
-  // ... (options ve return Bar kısmı aynı)
   const options = {
-    // ... (options objesi) ...
+    ...commonChartOptions,
+    scales: {
+      x: {
+        title: { display: true, text: xAxisLabel },
+        grid: { display: false },
+      },
+      y: {
+        title: { display: true, text: yAxisLabel },
+        beginAtZero: true,
+      },
+    },
     plugins: {
-      // ...
+      ...commonChartOptions.plugins,
+      legend: {
+        display: false, // Genellikle dağılım bar chart'larında tek dataset olur, lejant gereksiz.
+      },
       title: {
-        display: !!title, // Başlık varsa göster
+        display: !!title, // Eğer bu bileşene bir title prop'u geçersek göster
         text: title,
-        // ...
+        padding: { bottom: 10 },
       },
     },
   };
 
-  return <Bar data={data} options={options} />;
+  return <Bar data={dataForRender} options={options} />;
 };
 
 export default DistributionBarChart;

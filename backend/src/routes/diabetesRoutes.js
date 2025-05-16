@@ -1,11 +1,16 @@
+// backend/src/routes/diabetesRoutes.js
 const express = require("express");
 const diabetesController = require("../controllers/diabetesController");
 const router = express.Router();
 
-//Tüm verileri getir
-router.get("/", diabetesController.getAllData);
+// Dashboard verilerini getiren ana endpoint
+router.get("/dashboard", diabetesController.getDashboardData);
 
-//CSV'den verileri yükle
-router.post("/seed", diabetesController.seedData);
+// Eğer / (root) endpoint'i de tüm ham veriyi döndürecekse, bu da eklenebilir:
+// const OldDiabetesController = require('../controllers/oldDiabetesController'); // Ayrı bir controller'da getAll olabilir
+// router.get('/', OldDiabetesController.getAllData);
+
+// Opsiyonel: Seed endpoint'i (kullanılmıyorsa yorumda kalabilir)
+// router.post('/seed', diabetesController.seedData);
 
 module.exports = router;

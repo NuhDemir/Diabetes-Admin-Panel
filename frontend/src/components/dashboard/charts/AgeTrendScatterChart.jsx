@@ -13,14 +13,16 @@ const AgeTrendScatterChart = ({ trendData, valueKey, yAxisLabel, title }) => {
     if (!trendData || trendData.length === 0) return null;
 
     let color, borderColor, label;
+    // valueKey doğrudan backend'den gelen alan adı olacak ('Glucose' veya 'BloodPressure')
     if (valueKey === "Glucose") {
-      color = glucoseColor;
+      color = glucoseColor; // utils/chartUtils.js'den
       borderColor = glucoseBorderColor;
       label = "Glikoz Değeri";
     } else if (valueKey === "BloodPressure") {
-      color = bpColor;
+      // Doğrudan 'BloodPressure' ile karşılaştır
+      color = bpColor; // utils/chartUtils.js'den
       borderColor = bpBorderColor;
-      label = "Kan Basıncı (mg/dL)";
+      label = "Kan Basıncı"; // (mg/dL) yAxisLabel'da belirtilecek
     } else {
       color = "rgba(100, 100, 100, 0.6)"; // Default color
       borderColor = "rgba(100, 100, 100, 1)";

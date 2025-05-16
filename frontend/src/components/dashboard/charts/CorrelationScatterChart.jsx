@@ -3,23 +3,25 @@ import React, { useMemo } from "react";
 import { Scatter } from "react-chartjs-2";
 import {
   getScatterOptions,
-  riskColors,
-  riskBorderColors,
+  riskColors, // chartUtils'dan
+  riskBorderColors, // chartUtils'dan
 } from "../../../utils/chartUtils";
 
 const CorrelationScatterChart = ({ correlationData }) => {
-  const chartData = useMemo(() => {
+  // Prop adı aynı kalabilir
+  const chartDataForRender = useMemo(() => {
+    // chartData çakışmasın diye isim değiştirelim
     if (!correlationData || correlationData.length === 0) return null;
 
     return {
       datasets: [
         {
-          label: "Glikoz vs BMI (Risk)", // Lejantta görünmeyecek ama tooltip için iyi
-          data: correlationData, // { x: BMI, y: Glucose, risk: RiskLevel } formatında
+          label: "Glikoz vs BMI (Risk)", // Tooltip için
+          data: correlationData, // Backend'den gelen hazır veri
           pointBackgroundColor: (ctx) =>
-            riskColors[ctx.raw?.risk] || "rgba(201, 203, 207, 0.7)",
+            riskColors[ctx.raw?.risk] || "rgba(201, 203, 207, 0.7)", // riskColors chartUtils'da tanımlı olmalı
           pointBorderColor: (ctx) =>
-            riskBorderColors[ctx.raw?.risk] || "rgba(201, 203, 207, 1)",
+            riskBorderColors[ctx.raw?.risk] || "rgba(201, 203, 207, 1)", // riskBorderColors chartUtils'da tanımlı olmalı
           pointRadius: 5,
           pointHoverRadius: 7,
         },
@@ -27,22 +29,21 @@ const CorrelationScatterChart = ({ correlationData }) => {
     };
   }, [correlationData]);
 
-  if (!chartData) return null;
+  if (!chartDataForRender) return null; // Veri yoksa render etme
 
-  // Korelasyon grafiğinde lejantı gizleyebiliriz çünkü renkler noktaların kendisinde anlamlı
   const options = {
     ...getScatterOptions(
       "BMI (Vücut Kitle İndeksi)",
       "Glikoz Seviyesi",
-      "Glikoz ve BMI Korelasyonu"
+      "Glikoz ve BMI Korelasyonu" // Grafik başlığı ChartCard'dan geleceği için burası opsiyonel
     ),
     plugins: {
-      ...getScatterOptions().plugins, // getScatterOptions'dan tooltip vs. al
-      legend: { display: false }, // Lejantı gizle
+      ...getScatterOptions("BMI", "Glikoz").plugins, // getScatterOptions'dan tooltip vb. al, eksen başlıkları gereksiz
+      legend: { display: false }, // Lejantı gizle, renkler noktalarda anlamlı
     },
   };
 
-  return <Scatter data={chartData} options={options} />;
+  return <Scatter data={chartDataForRender} options={options} />;
 };
 
 export default CorrelationScatterChart;
